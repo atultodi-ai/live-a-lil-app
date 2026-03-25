@@ -1,0 +1,206 @@
+// Live A Little — Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum ItemStatus {
+  todo
+  ongoing
+  done
+  archived
+}
+
+enum ItemType {
+  travel
+  skill
+  experience
+  achievement
+  habit
+  relationship
+  other
+}
+
+enum CostTier {
+  free
+  low
+  moderate
+  high
+  very_high
+}
+
+enum EffortTier {
+  minimal
+  low
+  moderate
+  high
+  sustained
+}
+
+enum TimeHorizon {
+  immediate
+  short_term
+  long_term
+}
+
+enum ItemSource {
+  user
+  seed_library
+  ai_suggestion
+}
+
+// ─────────────────────────────────────────────
+// NEXTAUTH TABLES
+// ─────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────────────────────────
+// CORE APP TABLES
+// ─────────────────────────────────────────────
+
+model User {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  emailVerified      DateTime? @map("email_verified")
+  name               String?
+  image              String?
+  authProvider       String    @default("magic_link") @map("auth_provider")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  lastActive         DateTime  @default(now()) @map("last_active")
+  onboardingComplete Boolean   @default(false) @map("onboarding_complete")
+
+  accounts        Account[]
+  sessions        Session[]
+  situations      UserSituation[]
+  bucketListItems BucketListItem[]
+
+  @@map("users")
+}
+
+// Situation Knowledge Graph — append-only versioning.
+// Every update creates a new row. Latest version = current situation.
+model UserSituation {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  version   Int      @default(1)
+  data      Json     // Full SKG as JSONB
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, version])
+  @@map("user_situations")
+}
+
+model BucketListItem {
+  id                 String       @id @default(uuid())
+  userId             String       @map("user_id")
+  title              String
+  description        String?
+  priority           Int          @default(2) // 1=maybe 2=want_to_do 3=must_do
+  status             ItemStatus   @default(todo)
+  type               ItemType?    // AI fills this
+  bestSeason         String?      @map("best_season")
+  ageWindowMin       Int?         @map("age_window_min")
+  ageWindowMax       Int?         @map("age_window_max")
+  costEstimate       CostTier?    @map("cost_estimate")
+  effortLevel        EffortTier?  @map("effort_level")
+  timeHorizon        TimeHorizon? @map("time_horizon")
+  constraints        String[]     @default([])
+  doabilityScore     Int?         @map("doability_score") // 0-100
+  aiReasoning        String?      @map("ai_reasoning")
+  imageUrl           String?      @map("image_url")
+  completedAt        DateTime?    @map("completed_at")
+  completionPhotoUrl String?      @map("completion_photo_url")
+  completionNote     String?      @map("completion_note") // max 280 chars
+  source             ItemSource   @default(user)
+  seedItemId         String?      @map("seed_item_id")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, doabilityScore])
+  @@map("bucket_list_items")
+}
+
+model SeedLibraryItem {
+  id              String      @id // e.g., "seed_0001"
+  title           String
+  description     String
+  type            ItemType
+  imageKeyword    String      @map("image_keyword")
+  imageUrl        String?     @map("image_url") // cached — shared across all users who add this seed
+  ageRelevanceMin Int         @default(12) @map("age_relevance_min")
+  ageRelevanceMax Int         @default(89) @map("age_relevance_max")
+  costTier        CostTier    @map("cost_tier")
+  effortTier      EffortTier  @map("effort_tier")
+  timeHorizon     TimeHorizon @map("time_horizon")
+  popularityScore Int         @map("popularity_score") // 1-100
+  bestSeason      String      @default("any") @map("best_season")
+  constraints     String[]    @default([])
+  tags            String[]    @default([])
+  regionRelevance String[]    @default(["global"]) @map("region_relevance")
+
+  @@index([type])
+  @@index([popularityScore])
+  @@map("seed_library_items")
+}
+
+model BetaSignup {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("beta_signups")
+}

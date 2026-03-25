@@ -1,26 +1,177 @@
+/* Google Fonts — must precede all other rules */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap");
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ─────────────────────────────────────────────
+   LIVE A LITTLE — Design Token System
+   Based on DESIGN_PRINCIPLES.md
+───────────────────────────────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Primary palette — warm, earthy, alive */
+  --color-warm-white: #faf7f2;
+  --color-amber: #e8913a;
+  --color-terracotta: #c45d3e;
+  --color-charcoal: #2d2a26;
+  --color-stone: #7a7570;
+  --color-stone-light: #b5b0ab;
+  --color-border: #e8e2da;
+
+  /* Category colors */
+  --color-travel: #7aafcf;
+  --color-skill: #d4a843;
+  --color-experience: #d4708a;
+  --color-achievement: #5b8c5a;
+  --color-habit: #9b8ec2;
+  --color-relationship: #e07b6c;
+  /* Category aliases (for bg-category-* / text-category-* usage) */
+  --color-category-travel: #7aafcf;
+  --color-category-skill: #d4a843;
+  --color-category-experience: #d4708a;
+  --color-category-achievement: #5b8c5a;
+  --color-category-habit: #9b8ec2;
+  --color-category-relationship: #e07b6c;
+
+  /* Background */
+  --color-background: var(--color-warm-white);
+  --color-foreground: var(--color-charcoal);
+
+  /* Semantic */
+  --color-primary: var(--color-amber);
+  --color-primary-dark: var(--color-terracotta);
+  --color-muted: var(--color-stone);
+  --color-muted-light: var(--color-stone-light);
+
+  /* Border radius */
+  --radius-card: 1rem;
+  --radius-btn: 0.625rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────────
+   BASE STYLES
+───────────────────────────────────────────── */
+
+:root {
+  --background: #faf7f2;
+  --foreground: #2d2a26;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+/* ─────────────────────────────────────────────
+   TIMELINE ANIMATION — the heartbeat of the app
+───────────────────────────────────────────── */
+
+@keyframes timeline-flow {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-4px); }
+}
+
+@keyframes timeline-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.timeline-moving {
+  animation: timeline-flow 8s ease-in-out infinite alternate;
+}
+
+.timeline-pulse {
+  animation: timeline-pulse 3s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   CARD INTERACTIONS
+───────────────────────────────────────────── */
+
+.card-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(45, 42, 38, 0.12);
+}
+
+.card-lift:active {
+  transform: scale(0.98);
+}
+
+/* ─────────────────────────────────────────────
+   SKELETON LOADING
+───────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #ede8e1 25%, #f5f1eb 50%, #ede8e1 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+/* ─────────────────────────────────────────────
+   SHEET / MODAL ANIMATIONS
+───────────────────────────────────────────── */
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease-out both;
+}
+
+/* Hide scrollbar for filter pills */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Safe area for bottom nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* ─────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline-moving,
+  .timeline-pulse,
+  .skeleton,
+  .animate-slide-up,
+  .animate-fade-in {
+    animation: none;
+  }
+  .card-lift {
+    transition: none;
+  }
 }
