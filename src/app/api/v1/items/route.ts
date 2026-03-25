@@ -7,7 +7,7 @@ import { requireAuth } from "@/lib/auth/helpers";
 import { db } from "@/lib/db/client";
 import { ACTIVE_ITEM_CAP } from "@/lib/utils";
 import type { ItemStatus, ItemType, CostTier, TimeHorizon } from "@/types";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/generated/prisma";
 
 // ─── GET ─────────────────────────────────────
 

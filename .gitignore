@@ -42,4 +42,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
+# src/generated/prisma is intentionally committed — needed for Vercel deployments
+# but exclude platform-specific native binaries (regenerated per-platform by postinstall)
+src/generated/prisma/*.node

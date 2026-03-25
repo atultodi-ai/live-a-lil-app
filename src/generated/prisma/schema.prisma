@@ -134,7 +134,7 @@ model UserSituation {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
   version   Int      @default(1)
-  data      Json     // Full SKG as JSONB
+  data      Json // Full SKG as JSONB
   createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -150,7 +150,7 @@ model BucketListItem {
   description        String?
   priority           Int          @default(2) // 1=maybe 2=want_to_do 3=must_do
   status             ItemStatus   @default(todo)
-  type               ItemType?    // AI fills this
+  type               ItemType? // AI fills this
   bestSeason         String?      @map("best_season")
   ageWindowMin       Int?         @map("age_window_min")
   ageWindowMax       Int?         @map("age_window_max")

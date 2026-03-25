@@ -15,7 +15,7 @@ import { requireAuth } from "@/lib/auth/helpers";
 import { db } from "@/lib/db/client";
 import { getLatestSKG } from "@/lib/skg";
 import { ACTIVE_ITEM_CAP } from "@/lib/utils";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/generated/prisma";
 
 // ─── Title similarity helpers ─────────────────────────────────────────────────
 
