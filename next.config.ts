@@ -24,12 +24,7 @@ const nextConfig: NextConfig = {
         : []),
     ],
   },
-  experimental: {
-    // Enables server actions (used for form submissions in onboarding)
-    serverActions: {
-      allowedOrigins: ["localhost:3000"],
-    },
-  },
+  serverExternalPackages: ["@prisma/client", "prisma"],
 };
 
 export default nextConfig;
