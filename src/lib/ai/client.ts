@@ -7,7 +7,7 @@ const globalForAI = globalThis as unknown as {
 export const anthropic =
   globalForAI.anthropic ??
   new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
+    apiKey: process.env.ANTHROPIC_API_KEY ?? "missing-key",
   });
 
 if (process.env.NODE_ENV !== "production") {
