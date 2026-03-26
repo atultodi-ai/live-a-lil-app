@@ -25,10 +25,6 @@ const nextConfig: NextConfig = {
     ],
   },
   serverExternalPackages: ["@prisma/client", "prisma"],
-  // Tell Next.js to include the Prisma query engine binary in serverless bundles
-  outputFileTracingIncludes: {
-    "/api/**": ["./src/generated/prisma/*.node"],
-  },
 };
 
 export default nextConfig;
