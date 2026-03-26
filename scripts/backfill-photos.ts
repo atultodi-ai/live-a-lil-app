@@ -7,7 +7,7 @@
  * Unsplash free tier = 50 req/hour → script auto-pauses between batches.
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../src/generated/prisma";
 import { fetchUnsplashPhoto, buildImageKeyword } from "../src/lib/unsplash";
 
 const BATCH_SIZE = 8;
